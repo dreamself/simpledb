@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The Catalog keeps track of all available tables in the database and their
@@ -18,14 +17,29 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Catalog {
 
+    private Map<String, CatalogItem> catalogItemsKeyName = new HashMap<>();
+
+    private Map<Integer, CatalogItem> catalogItemsKeyId = new HashMap<>();
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
-        // some code goes here
+        // some code goes here`
     }
 
+    public static class CatalogItem{
+        public DbFile dbFile;
+        public String name;
+        public String keyField;
+
+        public CatalogItem(DbFile dbfile, String name, String keyField){
+            this.dbFile = dbfile;
+            this.name = name;
+            this.keyField = keyField;
+        }
+
+    }
     /**
      * Add a new table to the catalog.
      * This table's contents are stored in the specified DbFile.
@@ -36,7 +50,22 @@ public class Catalog {
      * @param pkeyField the name of the primary key field
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        // some code goes here
+        if (catalogItemsKeyName.containsKey(name)){
+            Iterator<Map.Entry<Integer, CatalogItem>> iter = catalogItemsKeyId.entrySet().iterator();
+            while(iter.hasNext()){
+                Map.Entry<Integer, CatalogItem> entry = iter.next();
+                if (entry.getValue().name.equals(name)){
+                    iter.remove();
+                }
+            }
+            for (Map.Entry<Integer, CatalogItem> entry : catalogItemsKeyId.entrySet()){
+                if (entry.getValue().name.equals(name)){
+
+                }
+            }
+        }
+        catalogItemsKeyName.put(name, new CatalogItem(file, name, pkeyField));
+        catalogItemsKeyId.put(file.getId(), new CatalogItem(file, name, pkeyField));
     }
 
     public void addTable(DbFile file, String name) {
@@ -59,8 +88,12 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
-        // some code goes here
-        return 0;
+        CatalogItem item = catalogItemsKeyName.get(name);
+        if (item == null){
+            throw new NoSuchElementException("find no element");
+        } else {
+            return item.dbFile.getId();
+        }
     }
 
     /**
@@ -70,8 +103,12 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        CatalogItem item = catalogItemsKeyId.get(tableid);
+        if (item == null){
+            throw new NoSuchElementException();
+        } else {
+            return item.dbFile.getTupleDesc();
+        }
     }
 
     /**
@@ -82,27 +119,44 @@ public class Catalog {
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        CatalogItem item = catalogItemsKeyId.get(tableid);
+        if (item == null){
+            throw new NoSuchElementException();
+        } else {
+            return item.dbFile;
+        }
     }
 
     public String getPrimaryKey(int tableid) {
         // some code goes here
-        return null;
+        CatalogItem item = catalogItemsKeyId.get(tableid);
+        if (item == null){
+            throw new NoSuchElementException();
+        } else {
+            return item.keyField;
+        }
     }
 
     public Iterator<Integer> tableIdIterator() {
         // some code goes here
-        return null;
+        return catalogItemsKeyId.keySet().iterator();
     }
 
     public String getTableName(int id) {
         // some code goes here
-        return null;
+        CatalogItem item = catalogItemsKeyId.get(id);
+        if (item == null){
+            return null;
+        } else {
+            return item.name;
+        }
     }
     
     /** Delete all tables from the catalog */
     public void clear() {
         // some code goes here
+        catalogItemsKeyId.clear();
+        catalogItemsKeyName.clear();
     }
     
     /**
