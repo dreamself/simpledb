@@ -11,6 +11,14 @@ public class SeqScan implements OpIterator {
 
     private static final long serialVersionUID = 1L;
 
+    private TransactionId tid;
+
+    private int tableid;
+
+    private String tableAlias;
+
+    private DbFileIterator tupleIterator;
+
     /**
      * Creates a sequential scan over the specified table as a part of the
      * specified transaction.
@@ -28,25 +36,25 @@ public class SeqScan implements OpIterator {
      *            tableAlias.null, or null.null).
      */
     public SeqScan(TransactionId tid, int tableid, String tableAlias) {
-        // some code goes here
+        this.tid = tid;
+        this.tableid = tableid;
+        this.tableAlias = tableAlias;
+        this.tupleIterator = Database.getCatalog().getDatabaseFile(tableid).iterator(tid);
     }
 
     /**
-     * @return
-     *       return the table name of the table the operator scans. This should
-     *       be the actual name of the table in the catalog of the database
-     * */
+     * @return return the table name of the table the operator scans. This should
+     * be the actual name of the table in the catalog of the database
+     */
     public String getTableName() {
-        return null;
+        return Database.getCatalog().getTableName(tableid);
     }
 
     /**
      * @return Return the alias of the table this operator scans.
-     * */
-    public String getAlias()
-    {
-        // some code goes here
-        return null;
+     */
+    public String getAlias() {
+        return tableAlias;
     }
 
     /**
@@ -63,6 +71,8 @@ public class SeqScan implements OpIterator {
      */
     public void reset(int tableid, String tableAlias) {
         // some code goes here
+        this.tableid = tableid;
+        this.tableAlias = tableAlias;
     }
 
     public SeqScan(TransactionId tid, int tableId) {
@@ -71,6 +81,7 @@ public class SeqScan implements OpIterator {
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
+        tupleIterator.open();
     }
 
     /**
@@ -84,27 +95,24 @@ public class SeqScan implements OpIterator {
      *         prefixed with the tableAlias string from the constructor.
      */
     public TupleDesc getTupleDesc() {
-        // some code goes here
-        return null;
+        return Database.getCatalog().getTupleDesc(tableid);
     }
 
     public boolean hasNext() throws TransactionAbortedException, DbException {
-        // some code goes here
-        return false;
+        return tupleIterator.hasNext();
     }
 
     public Tuple next() throws NoSuchElementException,
             TransactionAbortedException, DbException {
-        // some code goes here
-        return null;
+        return tupleIterator.next();
     }
 
     public void close() {
-        // some code goes here
+        tupleIterator.close();
     }
 
     public void rewind() throws DbException, NoSuchElementException,
             TransactionAbortedException {
-        // some code goes here
+        tupleIterator.rewind();
     }
 }

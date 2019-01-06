@@ -54,7 +54,7 @@ public class HeapPage implements Page {
             // allocate and read the actual records of this page
             for (int i=0; i<tuples.length; i++)
                 tuples[i] = readNextTuple(dis,i);
-        }catch(NoSuchElementException e){
+        }catch(Exception e){
             e.printStackTrace();
         }
         dis.close();
@@ -77,7 +77,7 @@ public class HeapPage implements Page {
      */
     private int getHeaderSize() {
         // some code goes here
-        return (int)Math.ceil(getNumTuples()/8);
+        return (int)Math.ceil(numSlots/8.0);
 
     }
     

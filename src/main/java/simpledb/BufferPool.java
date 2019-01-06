@@ -27,6 +27,7 @@ public class BufferPool {
 
     private Map<PageId, Page> pages;
 
+
     
     /** Default number of pages passed to the constructor. This is used by
     other classes. BufferPool should use the numPages argument to the
@@ -76,7 +77,14 @@ public class BufferPool {
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
         // some code goes here
-        return pages.get(pid);
+        if (pages.containsKey(pid)) {//直接命中
+            return pages.get(pid);
+        } else {//未命中，访问磁盘并缓存
+            HeapFile table = (HeapFile) Database.getCatalog().getDatabaseFile(pid.getTableId());
+            HeapPage newPage = (HeapPage) table.readPage(pid);
+            addNewPage(pid, newPage);
+            return newPage;
+        }
     }
 
     /**
@@ -210,6 +218,14 @@ public class BufferPool {
     private synchronized  void evictPage() throws DbException {
         // some code goes here
         // not necessary for lab1
+    }
+
+    private void addNewPage(PageId pid, Page newPage) {
+        pages.put(pid, newPage);
+        //如果超出了最大的缓存页数量
+        if (pages.size() > numPages) {
+            // TODO: 17-5-26 implement this
+        }
     }
 
 }
