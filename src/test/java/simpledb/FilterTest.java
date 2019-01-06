@@ -37,6 +37,7 @@ public class FilterTest extends SimpleDbTestBase {
    * Unit test for Filter.rewind()
    */
   @Test public void rewind() throws Exception {
+    this.scan = new TestUtil.MockScan(0, 5, testWidth);
     Predicate pred = new Predicate(0, Predicate.Op.EQUALS, TestUtil.getField(0));
     Filter op = new Filter(pred, scan);
     op.open();
@@ -91,7 +92,7 @@ public class FilterTest extends SimpleDbTestBase {
         op.next()));
     op.close();
 
-    this.scan = new TestUtil.MockScan(-5, 5, testWidth);
+    this.scan = new TestUtil.MockScan(0, 5, testWidth);
     pred = new Predicate(0, Predicate.Op.EQUALS, TestUtil.getField(0));
     op = new Filter(pred, scan);
     op.open();
@@ -99,7 +100,7 @@ public class FilterTest extends SimpleDbTestBase {
         op.next()));
     op.close();
 
-    this.scan = new TestUtil.MockScan(-5, 5, testWidth);
+    this.scan = new TestUtil.MockScan(4, 5, testWidth);
     pred = new Predicate(0, Predicate.Op.EQUALS, TestUtil.getField(4));
     op = new Filter(pred, scan);
     op.open();
